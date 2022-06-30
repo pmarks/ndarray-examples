@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use ndarray::{stack, Array, Array2, Axis};
+use ndarray::{concatenate, Array, Array2, Axis};
 use ndarray_rand::RandomExt;
 use ndarray_rand::rand_distr::Normal;
 
@@ -15,7 +15,7 @@ fn get_data(n_samples: usize, n_features: usize) -> Array2<f64> {
     let shape = (n_samples / 2, n_features);
     let X1: Array2<f64> = Array::random(shape, Normal::new(1000., 0.1).unwrap());
     let X2: Array2<f64> = Array::random(shape, Normal::new(-1000., 0.1).unwrap());
-    stack(Axis(0), &[X1.view(), X2.view()]).unwrap().to_owned()
+    concatenate(Axis(0), &[X1.view(), X2.view()]).unwrap().to_owned()
 }
 
 pub fn main() {

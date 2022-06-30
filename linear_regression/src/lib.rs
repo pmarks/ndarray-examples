@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
-use ndarray::{stack, Array, Array1, ArrayBase, Axis, Data, Ix1, Ix2};
+use ndarray::{concatenate, Array, Array1, ArrayBase, Axis, Data, Ix1, Ix2};
 use ndarray_linalg::Solve;
+
 
 /// The simple linear regression model is
 ///     y = bX + e  where e ~ N(0, sigma^2 * I)
@@ -49,7 +50,7 @@ impl LinearRegression {
         // If we are fitting the intercept, we need an additional column
         self.beta = if self.fit_intercept {
             let dummy_column: Array<f64, _> = Array::ones((n_samples, 1));
-            let X = stack(Axis(1), &[dummy_column.view(), X.view()]).unwrap();
+            let X = concatenate(Axis(1), &[dummy_column.view(), X.view()]).unwrap();
             Some(LinearRegression::solve_normal_equation(&X, y))
         } else {
             Some(LinearRegression::solve_normal_equation(X, y))
@@ -70,7 +71,7 @@ impl LinearRegression {
         // If we are fitting the intercept, we need an additional column
         if self.fit_intercept {
             let dummy_column: Array<f64, _> = Array::ones((n_samples, 1));
-            let X = stack(Axis(1), &[dummy_column.view(), X.view()]).unwrap();
+            let X = concatenate(Axis(1), &[dummy_column.view(), X.view()]).unwrap();
             self._predict(&X)
         } else {
             self._predict(X)
@@ -84,7 +85,8 @@ impl LinearRegression {
     {
         let rhs = X.t().dot(y);
         let linear_operator = X.t().dot(X);
-        linear_operator.solve_into(rhs).unwrap()
+        //linear_operator.solve_into(rhs).unwrap()
+        Solve::solve_into(&linear_operator, rhs).unwrap()
     }
 
     fn _predict<A>(&self, X: &ArrayBase<A, Ix2>) -> Array1<f64>
